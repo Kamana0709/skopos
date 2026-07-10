@@ -7,7 +7,7 @@ Current Version: V1
 """
 
 from typing import Any
-from ..models.user_profile import UserProfile
+from app.models.user_profile import UserProfile
 
 def build_recommendation_prompt(profile: UserProfile) -> str:
     """Build the combined recommendation user prompt from a UserProfile."""
@@ -56,3 +56,19 @@ def _sanitize_profile_fields(profile: UserProfile) -> dict[str, Any]:
         "available_hours_per_week": profile.available_hours_per_week or 5,
         "career_goals": sanitize_string(profile.career_goals or "Not specified"),
     }
+
+"""Recommendation prompt template."""
+
+RECOMMENDATION_PROMPT_TEMPLATE = """Based on the user's profile, provide a personalized career recommendation.
+
+{profile_data}
+
+Please provide a comprehensive recommendation following the structure in the system prompt.
+
+Important:
+- Be specific and actionable
+- Provide concrete resources (courses, books, projects)
+- Consider the user's available hours per week
+- Match recommendations to their experience level
+- Suggest realistic timelines"""
+

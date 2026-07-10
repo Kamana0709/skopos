@@ -7,9 +7,9 @@ Dependencies: prompts/* modules
 
 import logging
 from typing import Tuple
-from ..models.user_profile import UserProfile
-from ..prompts.system_prompt import SYSTEM_PROMPT_V1, SYSTEM_PROMPT_VERSION
-from ..prompts.recommendation_prompt import build_recommendation_prompt
+from app.models.user_profile import UserProfile
+from app.prompts.system_prompt import SYSTEM_PROMPT_V1, SYSTEM_PROMPT_VERSION
+from app.prompts.recommendation_prompt import build_recommendation_prompt
 
 logger = logging.getLogger(__name__)
 
@@ -83,3 +83,71 @@ class PromptBuilder:
         )
         
         return system_prompt, user_prompt
+    
+"""Prompt construction utilities."""
+
+from typing import Tuple
+import json
+
+from app.schemas.profile import UserProfile
+from app.prompts.system_prompt import SYSTEM_PROMPT
+from app.prompts.recommendation_prompt import RECOMMENDATION_PROMPT_TEMPLATE
+
+
+class PromptBuilder:
+    """
+    Builds system and user prompts from validated UserProfile.
+    
+    This is the SINGLE place where prompt delimiting and construction occurs.
+    """
+    
+    @staticmethod
+    def build_prompts(profile: UserProfile) -> Tuple[str, str]:
+        """
+        Build system and user prompts from a validated profile.
+        
+        Args:
+            profile: Validated UserProfile
+            
+        Returns:
+            Tuple of (system_prompt, user_prompt)
+        """
+        # Use the fixed system prompt
+        system_prompt = SYSTEM_PROMPT
+        
+        # Build user profile data with XML-style delimiting for injection defense
+        profile_data = PromptBuilder._format_profile(profile)
+        
+        # Wrap in <profile> tags as the sole injection defense choke point
+        user_prompt = RECOMMENDATION_PROMPT_TEMPLATE.format(profile_data=profile_data)
+        
+        return system_prompt, user_prompt
+    
+    @staticmethod
+    def _format_profile(profile: UserProfile) -> str:
+        """Format user profile as structured text with delimiting."""
+        lines = [
+            "<profile>",
+            f"  <education>",
+            f"    <level>{profile.education.level.value}</level>",
+        ]
+        
+        if profile.education.field_of_study:
+            lines.append(f"    <field_of_study>{profile.education.field_of_study}</field_of_study>")
+        lines.append("  </education>")
+        
+        if profile.current_skills:
+            skills_str = ", ".join(profile.current_skills)
+            lines.append(f"  <current_skills>{skills_str}</current_skills>")
+        
+        interests_str = ", ".join(profile.interests)
+        lines.append(f"  <interests>{interests_str}</interests>")
+        lines.append(f"  <experience_level>{profile.experience_level.value}</experience_level>")
+        
+        preferences_str = ", ".join([p.value for p in profile.learning_preferences])
+        lines.append(f"  <learning_preferences>{preferences_str}</learning_preferences>")
+        lines.append(f"  <available_hours_per_week>{profile.available_hours_per_week}</available_hours_per_week>")
+        lines.append(f"  <career_goals>{profile.career_goals}</career_goals>")
+        lines.append("</profile>")
+        
+        return "\n".join(lines)

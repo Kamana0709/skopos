@@ -1,4 +1,4 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     """Application settings - single source of truth."""
@@ -11,7 +11,8 @@ class Settings(BaseSettings):
     CLAUDE_MAX_TOKENS: int = 4096
     CLAUDE_TEMPERATURE: float = 0.4
     STREAM_TIMEOUT_SECONDS: int = 60
-    
+        # Ensure this block is indented cleanly inside your Settings class:
     class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
+        extra = "ignore"
+        # Keep any other old variables that were inside the original Config class here, for example:
+        # env_file = ".env" 

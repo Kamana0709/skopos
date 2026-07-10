@@ -8,12 +8,26 @@ Dependencies: AsyncAnthropic SDK (import restricted to this file)
 import asyncio
 import logging
 from typing import AsyncGenerator, Optional
+import time
+
 from anthropic import AsyncAnthropic
+from anthropic import APIError, APITimeoutError, RateLimitError, APIStatusError
+
+from app.exceptions.claude_exceptions import (
+    ClaudeAPIError,
+    ClaudeAuthError,
+    ClaudeOverloadedError,
+    ClaudeTimeoutError,
+)
+from app.config.settings import Settings
+
+
+
 from anthropic.types import MessageStreamEvent
-from ...models.claude_events import ClaudeStreamEvent
-from ...exceptions.claude_exceptions import *
-from ...core.settings import Settings  # from backend module
-from .section_detector import SectionDetector
+from app.models.claude_events import ClaudeStreamEvent
+from app.exceptions.claude_exceptions import *
+from app.core.settings import Settings  # from backend module
+from app.core.clients.section_detector import SectionDetector
 
 logger = logging.getLogger(__name__)
 
@@ -308,3 +322,142 @@ class ClaudeClient:
                 "sections_detected": list(self._section_detector._detected_sections),
             }
         )
+
+
+        """AsyncAnthropic wrapper - single entry point for Claude API calls."""
+
+
+
+
+
+class ClaudeClient:
+    """
+    Wrapper for AsyncAnthropic client with retry logic and centralized configuration.
+    
+    This is the ONLY module that imports the Anthropic SDK.
+    """
+    
+    def __init__(self, settings: Settings):
+        """Initialize Claude client with settings."""
+        self.settings = settings
+        self._client: Optional[AsyncAnthropic] = None
+        self._initialized = False
+    
+    def _ensure_client(self) -> None:
+        """Lazy initialize the AsyncAnthropic client."""
+        if not self._initialized:
+            try:
+                self._client = AsyncAnthropic(
+                    api_key=self.settings.anthropic_api_key,
+                    max_retries=0,  # We handle retries ourselves
+                    timeout=self.settings.connection_timeout_seconds,
+                )
+                self._initialized = True
+                logger.info("claude_client_initialized", extra={"model": self.settings.claude_model})
+            except Exception as e:
+                raise ClaudeAPIError(f"Failed to initialize Claude client: {e}") from e
+    
+    async def stream(
+        self,
+        system_prompt: str,
+        user_prompt: str,
+        max_retries: int = 3,
+    ) -> AsyncGenerator[str, None]:
+        """
+        Stream Claude response with retry logic.
+        
+        Args:
+            system_prompt: System prompt
+            user_prompt: User prompt
+            max_retries: Maximum retry attempts
+            
+        Yields:
+            Text deltas from Claude
+            
+        Raises:
+            ClaudeAuthError: Invalid API key or authentication failure
+            ClaudeOverloadedError: Claude service overloaded after retries
+            ClaudeTimeoutError: Timeout waiting for response
+            ClaudeAPIError: Other API errors
+        """
+        self._ensure_client()
+        
+        last_exception = None
+        
+        for attempt in range(max_retries + 1):
+            try:
+                logger.debug(
+                    "claude_stream_attempt",
+                    extra={"attempt": attempt + 1, "max_retries": max_retries}
+                )
+                
+                async with self._client.messages.stream(
+                    model=self.settings.claude_model,
+                    max_tokens=self.settings.claude_max_tokens,
+                    temperature=self.settings.claude_temperature,
+                    system=system_prompt,
+                    messages=[{"role": "user", "content": user_prompt}],
+                ) as stream:
+                    async for delta in stream.text_stream:
+                        yield delta
+                    return  # Successful completion
+                    
+            except APIStatusError as e:
+                status_code = e.status_code
+                error_body = getattr(e, "body", {})
+                error_type = error_body.get("error", {}).get("type", "")
+                
+                if status_code == 401:
+                    # Authentication error - don't retry
+                    logger.critical("claude_auth_error", extra={"status_code": status_code})
+                    raise ClaudeAuthError("Invalid or missing Anthropic API key")
+                elif status_code == 429:
+                    # Rate limited - retry with backoff
+                    last_exception = e
+                    if attempt < max_retries:
+                        wait_time = 2 ** attempt  # Exponential backoff
+                        logger.warning(
+                            "claude_rate_limit_retry",
+                            extra={"attempt": attempt + 1, "wait_time": wait_time}
+                        )
+                        await asyncio.sleep(wait_time)
+                        continue
+                    else:
+                        logger.error("claude_overloaded", extra={"retries_exhausted": True})
+                        raise ClaudeOverloadedError("Claude service is currently overloaded. Please try again later.")
+                elif status_code == 500:
+                    # Server error - retry with backoff
+                    last_exception = e
+                    if attempt < max_retries:
+                        wait_time = 2 ** attempt
+                        await asyncio.sleep(wait_time)
+                        continue
+                    else:
+                        raise ClaudeAPIError(f"Claude API server error: {e}")
+                else:
+                    raise ClaudeAPIError(f"Claude API error: {e}")
+                    
+            except APITimeoutError as e:
+                last_exception = e
+                if attempt < max_retries:
+                    wait_time = 2 ** attempt
+                    await asyncio.sleep(wait_time)
+                    continue
+                else:
+                    raise ClaudeTimeoutError("Timeout waiting for Claude response")
+                    
+            except RateLimitError as e:
+                last_exception = e
+                if attempt < max_retries:
+                    wait_time = 2 ** attempt
+                    await asyncio.sleep(wait_time)
+                    continue
+                else:
+                    raise ClaudeOverloadedError("Rate limit exceeded. Please try again later.")
+                    
+            except Exception as e:
+                raise ClaudeAPIError(f"Unexpected Claude API error: {e}") from e
+        
+        # If we exhausted retries
+        if last_exception:
+            raise ClaudeAPIError(f"Claude API error after {max_retries} retries: {last_exception}")

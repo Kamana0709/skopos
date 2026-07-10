@@ -6,7 +6,7 @@ Output Contract: Produces only the ## Roadmap section with phased timeline
 Current Version: V1
 """
 
-from .recommendation_prompt import _sanitize_profile_fields
+from app.prompts.recommendation_prompt import _sanitize_profile_fields
 
 def build_roadmap_prompt(profile) -> str:
     """

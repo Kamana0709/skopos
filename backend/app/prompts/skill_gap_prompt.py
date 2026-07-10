@@ -6,7 +6,7 @@ Output Contract: Produces only the ## Skill Gap Analysis section
 Current Version: V1
 """
 
-from .recommendation_prompt import _sanitize_profile_fields
+from app.prompts.recommendation_prompt import _sanitize_profile_fields
 
 def build_skill_gap_prompt(profile) -> str:
     """Build a prompt focused narrowly on generating only the Skill Gap Analysis section."""
