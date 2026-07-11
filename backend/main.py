@@ -1,10 +1,10 @@
 from fastapi import FastAPI, Depends
 from anthropic import AsyncAnthropic
-from core.settings import Settings
-from core.clients.claude_client import ClaudeClient
+from app.core.settings import Settings
+from app.core.clients.claude_client import ClaudeClient
 from app.services.prompt_builder import PromptBuilder
-from services.recommendation_service import RecommendationService
-from core.sse.sse_formatter import SSEFormatter
+from app.services.recommendation_service import RecommendationService
+from app.core.sse.sse_formatter import SSEFormatter
 from app.models.user_profile import UserProfile
 
 
