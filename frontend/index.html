@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<<<<<<< HEAD
 <html lang="en">
 
 <head>
@@ -262,4 +263,44 @@
     <script type="module" src="assets/js/main.js"></script>
 </body>
 
+=======
+<html>
+<head>
+    <title>Skopos Test</title>
+</head>
+<body>
+    <div id="output"></div>
+    <script>
+        const output = document.getElementById('output');
+        
+        // Simulate a profile submission
+        const profile = {
+            education_level: "Bachelor's",
+            field_of_study: "Computer Science",
+            current_skills: ["Python", "JavaScript"],
+            interests: ["AI"],
+            experience_level: "mid",
+            learning_preferences: ["video"],
+            available_hours_per_week: 10,
+            career_goals: "Become an AI Engineer"
+        };
+        
+        const eventSource = new EventSource('/api/v1/recommendations/stream');
+        
+        eventSource.addEventListener('section', (e) => {
+            const data = JSON.parse(e.data);
+            output.innerHTML += `<h2>${data.section}</h2>`;
+        });
+        
+        eventSource.addEventListener('chunk', (e) => {
+            const data = JSON.parse(e.data);
+            output.innerHTML += data.text;
+        });
+        
+        eventSource.addEventListener('done', () => {
+            output.innerHTML += '<p>Complete!</p>';
+        });
+    </script>
+</body>
+>>>>>>> backendbranch
 </html>
