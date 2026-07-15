@@ -26,7 +26,7 @@ from app.config.settings import Settings
 from anthropic.types import MessageStreamEvent
 from app.models.claude_events import ClaudeStreamEvent
 from app.exceptions.claude_exceptions import *
-from app.core.settings import Settings  # from backend module
+"""from app.core.settings import Settings  # from backend module"""
 from app.core.clients.section_detector import SectionDetector
 
 logger = logging.getLogger(__name__)

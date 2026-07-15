@@ -1,5 +1,5 @@
-"""Global exception handlers."""
 
+"""Global exception handlers."""
 import logging
 from typing import Any, Dict
 
@@ -24,11 +24,11 @@ logger = logging.getLogger(__name__)
 
 
 def register_exception_handlers(app):
-    """Register all exception handlers."""
+
     
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(request: Request, exc: RequestValidationError):
-        """Handle Pydantic validation errors."""
+        """"""
         correlation_id = get_correlation_id()
         
         details = []
@@ -58,7 +58,7 @@ def register_exception_handlers(app):
     
     @app.exception_handler(RateLimitExceeded)
     async def rate_limit_exception_handler(request: Request, exc: RateLimitExceeded):
-        """Handle rate limit exceeded errors."""
+        """"""
         correlation_id = get_correlation_id()
         
         response = ErrorResponse(
@@ -77,7 +77,7 @@ def register_exception_handlers(app):
     
     @app.exception_handler(ClaudeAuthError)
     async def claude_auth_error_handler(request: Request, exc: ClaudeAuthError):
-        """Handle Claude authentication errors."""
+        """"""
         correlation_id = get_correlation_id()
         
         logger.critical(
@@ -99,9 +99,9 @@ def register_exception_handlers(app):
             content=response.model_dump(),
         )
     
-    @app.exception_handler((ClaudeOverloadedError, ClaudeTimeoutError, ClaudeStreamTimeoutError))
+    "@app.exception_handler((ClaudeOverloadedError, ClaudeTimeoutError, ClaudeStreamTimeoutError))"
     async def claude_service_error_handler(request: Request, exc: ClaudeAPIError):
-        """Handle Claude service errors."""
+        """"""
         correlation_id = get_correlation_id()
         
         logger.error(
@@ -123,10 +123,12 @@ def register_exception_handlers(app):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content=response.model_dump(),
         )
-    
+    app.add_exception_handler(ClaudeOverloadedError, claude_service_error_handler)
+    app.add_exception_handler(ClaudeTimeoutError, claude_service_error_handler)
+    app.add_exception_handler(ClaudeStreamTimeoutError, claude_service_error_handler)
     @app.exception_handler(AppException)
     async def app_exception_handler(request: Request, exc: AppException):
-        """Handle general application exceptions."""
+        """"""
         correlation_id = get_correlation_id()
         
         logger.error(
@@ -151,7 +153,7 @@ def register_exception_handlers(app):
     
     @app.exception_handler(Exception)
     async def unhandled_exception_handler(request: Request, exc: Exception):
-        """Handle unhandled exceptions."""
+        """"""
         correlation_id = get_correlation_id()
         
         logger.exception(
@@ -173,3 +175,5 @@ def register_exception_handlers(app):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content=response.model_dump(),
         )
+    
+
