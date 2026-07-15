@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<<<<<<< HEAD
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Skopos — Your AI Career Roadmap</title>
+    <meta name="description"
+        content="Answer a few questions and get a personalized career roadmap: skill gaps, certifications, projects, and resources — generated for you." />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="stylesheet" href="assets/css/base.css" />
+    <link rel="stylesheet" href="assets/css/layout.css" />
+    <link rel="stylesheet" href="assets/css/components.css" />
+</head>
+
+<body>
+    <a href="#main-content" class="u-skip-link">Skip to content</a>
+
+    <div class="app-shell">
+        <header id="navbar-mount"></header>
+
+        <main id="main-content" class="app-main">
+            <div id="error-banner-slot" class="error-banner-slot" aria-live="assertive"></div>
+
+            <!-- ============ LANDING VIEW ============ -->
+            <section id="view-landing" class="view">
+                <div class="container">
+                    <div class="hero reticle">
+                        <span class="hero__eyebrow">AI career roadmap</span>
+                        <h1 class="hero__title" tabindex="-1">Aim your next career move with precision.</h1>
+                        <p class="hero__subtitle">
+                            Tell us where you are and where you want to go. Skopos generates a personalized
+                            roadmap — skill gaps, certifications, projects, and resources — in real time.
+                        </p>
+                        <div class="hero__cta">
+                            <button type="button" id="start-btn" class="btn btn--primary">Build my roadmap</button>
+                        </div>
+
+                        <div class="value-props">
+                            <div class="card">
+                                <div class="card__header">
+                                    <span class="card__icon" data-icon="icon-skill-gap"></span>
+                                    <h3 class="card__title">Find the gaps</h3>
+                                </div>
+                                <p class="card__body">See exactly which skills stand between you and your goal.</p>
+                            </div>
+                            <div class="card">
+                                <div class="card__header">
+                                    <span class="card__icon" data-icon="icon-roadmap"></span>
+                                    <h3 class="card__title">Get a sequenced plan</h3>
+                                </div>
+                                <p class="card__body">A phase-by-phase roadmap sized to the hours you actually have.</p>
+                            </div>
+                            <div class="card">
+                                <div class="card__header">
+                                    <span class="card__icon" data-icon="icon-certification"></span>
+                                    <h3 class="card__title">Know what to build</h3>
+                                </div>
+                                <p class="card__body">Certifications, projects, and resources picked for your goal.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="how-it-works">
+                        <h2>How it works</h2>
+                        <div class="how-it-works__steps">
+                            <div>
+                                <h3>1. Tell us about you</h3>
+                                <p>Current role, skills, and experience level — takes about a minute.</p>
+                            </div>
+                            <div>
+                                <h3>2. Set your target</h3>
+                                <p>Your career goal, interests, and how much time you can put in each week.</p>
+                            </div>
+                            <div>
+                                <h3>3. Watch it build</h3>
+                                <p>Your roadmap streams in live, section by section.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ FORM / WIZARD VIEW ============ -->
+            <section id="view-form" class="view u-hidden">
+                <div class="container form-view">
+                    <form id="profile-form" novalidate>
+
+                        <!-- Step 1: Background -->
+                        <div class="wizard__step reticle" data-step="background" id="step-background">
+                            <h2 tabindex="-1">Your background</h2>
+
+                            <div class="form__field" id="field-currentRole">
+                                <label class="form__label" for="input-currentRole">Current role</label>
+                                <input class="form__control" type="text" id="input-currentRole" name="currentRole"
+                                    placeholder="e.g. Frontend Developer, Student, Career switcher"
+                                    autocomplete="off" />
+                                <p class="form__error" id="error-currentRole" role="alert"></p>
+                            </div>
+
+                            <div class="form__field" id="field-experienceLevel">
+                                <span class="form__label" id="label-experienceLevel">Experience level</span>
+                                <div class="segmented" role="group" aria-labelledby="label-experienceLevel"
+                                    data-field="experienceLevel">
+                                    <button type="button" class="segmented__option" data-value="student"
+                                        aria-pressed="false">Student</button>
+                                    <button type="button" class="segmented__option" data-value="0-2"
+                                        aria-pressed="false">0–2 yrs</button>
+                                    <button type="button" class="segmented__option" data-value="3-5"
+                                        aria-pressed="false">3–5 yrs</button>
+                                    <button type="button" class="segmented__option" data-value="6-10"
+                                        aria-pressed="false">6–10 yrs</button>
+                                    <button type="button" class="segmented__option" data-value="10+"
+                                        aria-pressed="false">10+ yrs</button>
+                                </div>
+                                <p class="form__error" id="error-experienceLevel" role="alert"></p>
+                            </div>
+
+                            <div class="form__field" id="field-skills">
+                                <label class="form__label" for="input-skills">
+                                    Current skills <span class="form__label-optional">(optional, up to 30)</span>
+                                </label>
+                                <div id="chip-mount-skills"></div>
+                                <p class="form__hint">Press Enter or comma after each skill.</p>
+                                <p class="form__error" id="error-skills" role="alert"></p>
+                            </div>
+
+                            <div class="form__actions form__actions--end">
+                                <button type="button" class="btn btn--primary" data-action="next">Next</button>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Goals -->
+                        <div class="wizard__step reticle u-hidden" data-step="goals" id="step-goals" aria-hidden="true">
+                            <h2 tabindex="-1">Your goals</h2>
+
+                            <div class="form__field" id="field-careerGoal">
+                                <label class="form__label" for="input-careerGoal">Career goal</label>
+                                <textarea class="form__control" id="input-careerGoal" name="careerGoal"
+                                    placeholder="e.g. I want to become a senior frontend engineer specializing in accessible, performant web apps within 2 years."
+                                    maxlength="500"></textarea>
+                                <p class="form__counter" id="counter-careerGoal">0 / 500</p>
+                                <p class="form__error" id="error-careerGoal" role="alert"></p>
+                            </div>
+
+                            <div class="form__field" id="field-interests">
+                                <label class="form__label" for="input-interests">Interests (1–15)</label>
+                                <div id="chip-mount-interests"></div>
+                                <p class="form__hint">e.g. accessibility, design systems, backend architecture.</p>
+                                <p class="form__error" id="error-interests" role="alert"></p>
+                            </div>
+
+                            <div class="form__actions">
+                                <button type="button" class="btn btn--secondary" data-action="back">Back</button>
+                                <button type="button" class="btn btn--primary" data-action="next">Next</button>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Availability -->
+                        <div class="wizard__step reticle u-hidden" data-step="availability" id="step-availability"
+                            aria-hidden="true">
+                            <h2 tabindex="-1">Your availability</h2>
+
+                            <div class="form__field" id="field-targetTimeline">
+                                <span class="form__label" id="label-targetTimeline">Target timeline</span>
+                                <div class="segmented" role="group" aria-labelledby="label-targetTimeline"
+                                    data-field="targetTimeline">
+                                    <button type="button" class="segmented__option" data-value="3mo"
+                                        aria-pressed="false">3 months</button>
+                                    <button type="button" class="segmented__option" data-value="6mo"
+                                        aria-pressed="false">6 months</button>
+                                    <button type="button" class="segmented__option" data-value="1yr"
+                                        aria-pressed="false">1 year</button>
+                                    <button type="button" class="segmented__option" data-value="2yr+"
+                                        aria-pressed="false">2+ years</button>
+                                </div>
+                                <p class="form__error" id="error-targetTimeline" role="alert"></p>
+                            </div>
+
+                            <div class="form__field" id="field-hoursPerWeek">
+                                <label class="form__label" for="input-hoursPerWeek">Hours per week you can
+                                    commit</label>
+                                <div class="form__range-row">
+                                    <input type="range" id="input-hoursPerWeek" min="1" max="80" step="1" value="10" />
+                                    <span class="form__range-value" id="value-hoursPerWeek">10 hrs</span>
+                                </div>
+                                <p class="form__error" id="error-hoursPerWeek" role="alert"></p>
+                            </div>
+
+                            <div class="form__field" id="field-learningStyle">
+                                <span class="form__label" id="label-learningStyle">Preferred learning style</span>
+                                <div class="segmented" role="group" aria-labelledby="label-learningStyle"
+                                    data-field="learningStyle">
+                                    <button type="button" class="segmented__option" data-value="self-paced"
+                                        aria-pressed="false">Self-paced</button>
+                                    <button type="button" class="segmented__option" data-value="structured"
+                                        aria-pressed="false">Structured courses</button>
+                                    <button type="button" class="segmented__option" data-value="project-based"
+                                        aria-pressed="false">Project-based</button>
+                                    <button type="button" class="segmented__option" data-value="mixed"
+                                        aria-pressed="false">Mixed</button>
+                                </div>
+                                <p class="form__error" id="error-learningStyle" role="alert"></p>
+                            </div>
+
+                            <div class="form__actions">
+                                <button type="button" class="btn btn--secondary" data-action="back">Back</button>
+                                <button type="button" class="btn btn--primary" data-action="next">Next</button>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: Review -->
+                        <div class="wizard__step reticle u-hidden" data-step="review" id="step-review"
+                            aria-hidden="true">
+                            <h2 tabindex="-1">Review your answers</h2>
+                            <div class="review__list" id="review-list"></div>
+                            <div class="form__actions">
+                                <button type="button" class="btn btn--secondary" data-action="back">Back</button>
+                                <button type="submit" class="btn btn--primary" id="submit-btn">
+                                    <span class="btn__label">Generate my roadmap</span>
+                                    <span class="btn__spinner"><span class="spinner spinner--sm"></span></span>
+                                </button>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </section>
+
+            <!-- ============ LOADING VIEW ============ -->
+            <section id="view-loading" class="view u-hidden">
+                <div class="container loading-view">
+                    <h2 tabindex="-1" class="loading__status" id="loading-status">Building your roadmap…</h2>
+                    <div id="results-sections" class="results__sections"></div>
+                </div>
+            </section>
+
+            <!-- ============ RESULTS VIEW ============ -->
+            <section id="view-results" class="view u-hidden">
+                <div class="container results-view">
+                    <div class="results__header">
+                        <h2 tabindex="-1">Your roadmap</h2>
+                        <div class="results__actions">
+                            <button type="button" class="btn btn--ghost" id="copy-btn">Copy as text</button>
+                            <button type="button" class="btn btn--ghost" id="download-btn">Download</button>
+                            <button type="button" class="btn btn--secondary" id="start-over-btn">Start over</button>
+                        </div>
+                    </div>
+                    <div id="results-sections-final" class="results__sections"></div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="site-footer">
+            <div class="container site-footer__row">
+                <span>Skopos — AI career roadmaps</span>
+                <span>Recommendations are a starting point, not professional career advice.</span>
+            </div>
+        </footer>
+    </div>
+
+    <script type="module" src="assets/js/main.js"></script>
+</body>
+
+=======
+<html>
+<head>
+    <title>Skopos Test</title>
+</head>
+<body>
+    <div id="output"></div>
+    <script>
+        const output = document.getElementById('output');
+        
+        // Simulate a profile submission
+        const profile = {
+            education_level: "Bachelor's",
+            field_of_study: "Computer Science",
+            current_skills: ["Python", "JavaScript"],
+            interests: ["AI"],
+            experience_level: "mid",
+            learning_preferences: ["video"],
+            available_hours_per_week: 10,
+            career_goals: "Become an AI Engineer"
+        };
+        
+        const eventSource = new EventSource('/api/v1/recommendations/stream');
+        
+        eventSource.addEventListener('section', (e) => {
+            const data = JSON.parse(e.data);
+            output.innerHTML += `<h2>${data.section}</h2>`;
+        });
+        
+        eventSource.addEventListener('chunk', (e) => {
+            const data = JSON.parse(e.data);
+            output.innerHTML += data.text;
+        });
+        
+        eventSource.addEventListener('done', () => {
+            output.innerHTML += '<p>Complete!</p>';
+        });
+    </script>
+</body>
+>>>>>>> backendbranch
+</html>
